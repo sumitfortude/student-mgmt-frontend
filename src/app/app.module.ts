@@ -1,19 +1,30 @@
-import { NgModule } from '@angular/core';
+import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
 import { AppComponent } from './app.component';
-import { StudentComponent } from './student/student.component';
+import { StudentComponent, UploadInterceptor } from './student/student.component';
 import { InputsModule } from '@progress/kendo-angular-inputs';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ButtonsModule } from "@progress/kendo-angular-buttons";
 
-import {APOLLO_OPTIONS} from 'apollo-angular';
+import {Apollo, APOLLO_OPTIONS} from 'apollo-angular';
 import {HttpLink} from 'apollo-angular/http';
 import {InMemoryCache} from '@apollo/client/core';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClient, HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { GridModule } from '@progress/kendo-angular-grid';
 import { AppRouting } from './app.routes';
 import { StudentModule } from './student/student.module';
+import { EditService } from './service/edit.service';
+import { UploadModule, UploadService } from '@progress/kendo-angular-upload';
+import { DialogsModule } from '@progress/kendo-angular-dialog';
+import { SocketService } from './service/socket.service';
+import { NotificationModule } from '@progress/kendo-angular-notification';
+import { environment } from 'src/environments/environment';
+
+
+
+
+
 
 
 
@@ -34,6 +45,11 @@ import { StudentModule } from './student/student.module';
     GridModule,
     AppRouting,
     StudentModule,
+    UploadModule,
+    DialogsModule,
+    NotificationModule
+   
+    
     
   ],
   providers: [
@@ -43,12 +59,31 @@ import { StudentModule } from './student/student.module';
         return {
           cache: new InMemoryCache(),
           link: httpLink.create({
-            uri: 'http://localhost:3000/graphql',
+            uri: environment.crudApiUrl,
           }),
         };
       },
       deps: [HttpLink],
     },
+    {
+      deps: [Apollo ],
+      provide: EditService,
+      useFactory:  (apollo: Apollo) => () => new EditService(apollo)
+    },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: UploadInterceptor,
+      multi: true
+    },
+    SocketService,
+    {
+      provide: APP_INITIALIZER,
+      useFactory: (ss: SocketService) => () =>{ return ss.load()},
+      deps: [SocketService],
+      multi: true
+    },
+    EditService
+    
   ],
   bootstrap: [AppComponent]
 })

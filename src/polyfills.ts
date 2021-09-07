@@ -63,6 +63,8 @@ import '@angular/localize/init';
  */
 import 'zone.js';  // Included with Angular CLI.
 
+// Global is not defined error 
+(window as any).global = window
 
 /***************************************************************************************************
  * APPLICATION IMPORTS

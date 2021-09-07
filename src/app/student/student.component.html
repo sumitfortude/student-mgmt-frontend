@@ -1,15 +1,81 @@
+
+<kendo-upload #upload [autoUpload]="false"
+ [saveUrl]="uploadSaveUrl"
+ [restrictions]="uploadRestrictions"
+(upload)="onUploadEvent($event)">
+</kendo-upload>
+
+
 <kendo-grid
-[data]="gridView"
-[pageSize]="pageSize"
-[skip]="skip"
-[pageable]="true"
-[height]="400"
-(pageChange)="pageChange($event)"
-(cellClick)="studentDetails($event)"
->
-<kendo-grid-column field="id" title="ID"> </kendo-grid-column>
-<kendo-grid-column field="name" title="Name"></kendo-grid-column>
-<kendo-grid-column field="email" title="Email"> </kendo-grid-column>
-<kendo-grid-column field="birthdate" title="BirthDate"></kendo-grid-column>
-<kendo-grid-column field="age" title="Age"> </kendo-grid-column>
-</kendo-grid>
+      [data]="view"
+      [height]="533"
+      [pageSize]="pageSize"
+      [skip]="skip"
+      [pageable]="true"
+      (pageChange)="pageChange($event)"
+      (edit)="editHandler($event)"
+      (cancel)="cancelHandler($event)"
+      (save)="saveHandler($event)"
+      (remove)="removeHandler($event)"
+      [navigable]="true"
+    >
+      <ng-template kendoGridToolbarTemplate>
+        
+        
+      </ng-template>
+      <kendo-grid-column
+        field="id"
+        title="ID"
+      ></kendo-grid-column>
+      <kendo-grid-column
+        field="name"
+        title="Name"
+      ></kendo-grid-column>
+      <kendo-grid-column
+        field="birthdate"
+        title="BirthDate"
+        editor="date" 
+        format="yyyy-MM-dd"
+      ></kendo-grid-column>
+      <kendo-grid-column
+        field="email"
+        title="Email"
+      ></kendo-grid-column>
+      <kendo-grid-column
+        field="age"
+        title="Age"
+      ></kendo-grid-column>
+      <kendo-grid-command-column title="command" >
+        <ng-template kendoGridCellTemplate let-isNew="isNew">
+          <button kendoGridEditCommand [primary]="true">Edit</button>
+          <button kendoGridRemoveCommand *ngIf="!dialogOpened" (click)="open()" >Remove</button>
+          <button kendoGridSaveCommand [disabled]="studentFormGroup?.invalid!">
+            {{ isNew ? "Add" : "Update" }}
+          </button>
+          <button kendoGridCancelCommand>
+            {{ isNew ? "Discard changes" : "Cancel" }}
+          </button>
+        </ng-template>
+      </kendo-grid-command-column>
+    </kendo-grid>
+
+
+
+
+    <kendo-dialog
+    title="Please confirm"
+    *ngIf="dialogOpened"
+    (close)="close()"
+    [minWidth]="250"
+    [width]="450"
+  >
+    <p style="margin: 30px; text-align: center;">
+      Are you sure you want to continue?
+    </p>
+    <kendo-dialog-actions>
+      <button kendoButton (click)="action('no')">No</button>
+      <button kendoButton (click)="action('yes')" >
+        Yes
+      </button>
+    </kendo-dialog-actions>
+  </kendo-dialog>
