@@ -150,6 +150,8 @@ export class StudentComponent implements OnInit {
         this.socketServie.notification("Your data has been removed", 'success')
         this.dialogOpened = false;
       });
+    }else{
+      this.dialogOpened = false;
     }
 
   }
